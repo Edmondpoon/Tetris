@@ -20,26 +20,29 @@ SKY_BLUE = (0,255,255)
 pygame.init()
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
 
-class block():
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+class i_block():
+    def __init__(self, x_pos, y_pos):
+        self.block1, self.block2, self.block3, self.block4 = [x_pos[0], y_pos[0]], [x_pos[1], y_pos[1]], [x_pos[2], y_pos[2]], [x_pos[3], y_pos[3]]
         self.color = SKY_BLUE
 
     def draw(self, window):
-        pygame.draw.rect(window, self.color, (self.x + 1, self.y + 1, 29, 29))
+        for block in [self.block1, self.block2, self.block3, self.block4]:
+            if block != None:
+                pygame.draw.rect(window, self.color, (block[0] + 1, block[1] + 1, 29, 29))
 
-    def underneath(self, set_blocks):
-        for PLACEHOLDER in set_blocks:
-            if PLACEHOLDER.x == self.x and PLACEHOLDER.y <=  self.y + 30:
-                    return True
-        return False
+def underneath(current_block, set_blocks):
+    SELF = current_block[0]
+    for set_block in set_blocks:
+        for block in [SELF.block1, SELF.block2, SELF.block3, SELF.block4]:
+            if set_block[0][0] == block[0] and set_block[0][1] <= block[1] + 30:
+                return True
+    return False
 
-def board(window, piece_size, current_blocks, set_blocks):
+def board(window, piece_size, current_block, set_blocks):
     window.fill(BLACK)
 
-    for PLACEHOLDER in set_blocks:
-        PLACEHOLDER.draw(window)
+    for block in set_blocks:
+        pygame.draw.rect(window, block[1], (block[0][0] + 1, block[0][1] + 1, 29, 29)) 
 
     for row in range(20):
         for column in range(11):
@@ -56,34 +59,35 @@ def board(window, piece_size, current_blocks, set_blocks):
             pygame.draw.line(window, GREY, (100, row * piece_size), (400, row * piece_size), 2)
         else:
             pygame.draw.line(window, GREY, (100, (row * piece_size) - 2), (400, (row * piece_size) - 2), 2)
-    if current_blocks != []:    
-        for PLACEHOLDER in current_blocks:
-            PLACEHOLDER.draw(window)    
+
+    if current_block != []:    
+        current_block[0].draw(window)    
 
     pygame.display.update()
 
-def fall(current_blocks, set_blocks):
-    if not len([True for PLACEHOLDER in current_blocks if PLACEHOLDER.underneath(set_blocks)]):
-        if min([PLACEHOLDER.y for PLACEHOLDER in current_blocks]) + 30 <= 570:
-            for PLACEHOLDER in current_blocks:
-                PLACEHOLDER.y += 30 
+def fall(current_block, set_blocks):
+    SELF = current_block[0]
+    if not underneath(current_block, set_blocks):
+        if min([block[1] for block in [SELF.block1, SELF.block2, SELF.block3, SELF.block4]]) + 30 <= 570:
+            for block in [SELF.block1, SELF.block2, SELF.block3, SELF.block4]:
+                block[1] += 30
             return False
         else:
-            for PLACEHOLDER in current_blocks:
-                set_blocks.append(PLACEHOLDER)
-            current_blocks.clear()
+            for block in [[SELF.block1, SELF.color],[SELF.block2, SELF.color], [SELF.block3, SELF.color], [SELF.block4, SELF.color]]:
+                set_blocks.append(block)
+            current_block.clear()
             return True
     else:
-        for PLACEHOLDER in current_blocks:
-            set_blocks.append(PLACEHOLDER)
-        current_blocks.clear()
+        for block in [[SELF.block1, SELF.color],[SELF.block2, SELF.color], [SELF.block3, SELF.color], [SELF.block4, SELF.color]]:
+            set_blocks.append(block)
+        current_block.clear()
         return True
 
 def main():
     RUN = True
     STARTx = (5 * 30) + 100
     STARTy = 0
-    CURRENT_BLOCKS = []
+    CURRENT_BLOCK = []
     SET_BLOCKS = []
     CURRENT_POS = 1
     TIMER = 40
@@ -95,20 +99,19 @@ def main():
             if event.type == pygame.QUIT:
                 RUN = False
 
-        if CURRENT_BLOCKS == []: 
-            #RANDOM>RADNOM to choose block here
+        if CURRENT_BLOCK == []:
+            #randomize blocks here
             if True:
-                for x_pos in [STARTx, STARTx -  30, STARTx - 60, STARTx + 30]:
-                    CURRENT_BLOCKS.append(block(x_pos, STARTy))
+                CURRENT_BLOCK.append(i_block([STARTx, STARTx -  30, STARTx - 60, STARTx + 30], [STARTy for _ in range(4)]))
 
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            if min([PLACEHOLDER.x for PLACEHOLDER in CURRENT_BLOCKS]) - 30 >= 100:
-                for PLACEHOLDER in CURRENT_BLOCKS:
-                    PLACEHOLDER.x -= 30
+            if min([block[0] for block in [CURRENT_BLOCK[0].block1, CURRENT_BLOCK[0].block2, CURRENT_BLOCK[0].block3, CURRENT_BLOCK[0].block4]]) - 30 >= 100:
+                for block in [CURRENT_BLOCK[0].block1, CURRENT_BLOCK[0].block2, CURRENT_BLOCK[0].block3, CURRENT_BLOCK[0].block4]:
+                    block[0] -= 30
         elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            if max([PLACEHOLDER.x for PLACEHOLDER in CURRENT_BLOCKS]) + 30 < 400:
-                for PLACEHOLDER in CURRENT_BLOCKS:
-                    PLACEHOLDER.x += 30
+            if max([block[0] for block in [CURRENT_BLOCK[0].block1, CURRENT_BLOCK[0].block2, CURRENT_BLOCK[0].block3, CURRENT_BLOCK[0].block4]]) + 30 < 400:
+                for block in [CURRENT_BLOCK[0].block1, CURRENT_BLOCK[0].block2, CURRENT_BLOCK[0].block3, CURRENT_BLOCK[0].block4]:
+                    block[0] += 30
         elif keys[pygame.K_UP] or keys[pygame.K_w]:
             if CURRENT_POS == 4:
                 CURRENT_POS = 1
@@ -121,13 +124,13 @@ def main():
             pass
 
         if TIMER >= 50:
-            if fall(CURRENT_BLOCKS, SET_BLOCKS):
+            if fall(CURRENT_BLOCK, SET_BLOCKS):
                 CURRENT_POS = 1
             TIMER = 0
         else:
             TIMER += 1
 
-        board(WINDOW, PIECE_SIZE, CURRENT_BLOCKS, SET_BLOCKS)
+        board(WINDOW, PIECE_SIZE, CURRENT_BLOCK, SET_BLOCKS)
         clock.tick(60)
 
     pygame.quit()
