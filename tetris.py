@@ -21,6 +21,15 @@ SKY_BLUE = (0, 255, 255)
 pygame.init()
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
 
+def side_collision(current_block, set_blocks):
+    SELF = current_block[0]
+    SET_BLOCKS = [block[0] for block in set_blocks]
+    for block in [SELF.block1, SELF.block2, SELF.block3, SELF.block4]:
+        if [block[0] + 30, block[1]] in SET_BLOCKS:
+            return "right"
+        elif [block[0] - 30, block[1]] in SET_BLOCKS:
+            return "left"
+
 def underneath(current_block, set_blocks):
     SELF = current_block[0]
     for set_block in set_blocks:
@@ -127,7 +136,9 @@ def main():
                 CURRENT_BLOCK.append(piece.s_block([220, 220, 220 - 30, 220 + 30], [30, 0, 30, 0]))
 
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            if min([block[0] for block in [CURRENT_BLOCK[0].block1, CURRENT_BLOCK[0].block2, CURRENT_BLOCK[0].block3, CURRENT_BLOCK[0].block4]]) - 30 >= 100 and MOVEMENT >= 5:
+            if side_collision(CURRENT_BLOCK, SET_BLOCKS) == "left":
+                pass
+            elif min([block[0] for block in [CURRENT_BLOCK[0].block1, CURRENT_BLOCK[0].block2, CURRENT_BLOCK[0].block3, CURRENT_BLOCK[0].block4]]) - 30 >= 100 and MOVEMENT >= 5:
                 for block in [CURRENT_BLOCK[0].block1, CURRENT_BLOCK[0].block2, CURRENT_BLOCK[0].block3, CURRENT_BLOCK[0].block4]:
                     block[0] -= 30
                 CURRENT_BLOCK[0].POR[0] -= 30
@@ -135,7 +146,9 @@ def main():
             else:
                 MOVEMENT += 1
         elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            if max([block[0] for block in [CURRENT_BLOCK[0].block1, CURRENT_BLOCK[0].block2, CURRENT_BLOCK[0].block3, CURRENT_BLOCK[0].block4]]) + 30 < 400 and MOVEMENT >= 5:
+            if side_collision(CURRENT_BLOCK, SET_BLOCKS) == "right":
+                pass
+            elif max([block[0] for block in [CURRENT_BLOCK[0].block1, CURRENT_BLOCK[0].block2, CURRENT_BLOCK[0].block3, CURRENT_BLOCK[0].block4]]) + 30 < 400 and MOVEMENT >= 5:
                 for block in [CURRENT_BLOCK[0].block1, CURRENT_BLOCK[0].block2, CURRENT_BLOCK[0].block3, CURRENT_BLOCK[0].block4]:
                     block[0] += 30
                 CURRENT_BLOCK[0].POR[0] += 30
