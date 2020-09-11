@@ -13,6 +13,14 @@ class allBlocks():
         for block in [self.block1, self.block2, self.block3, self.block4]:
             pygame.draw.rect(window, self.color, (block[0] + 1, block[1] + 1, 29, 29))
 
+    def side_collision(self, set_blocks):
+        SET_BLOCKS = [block[0] for block in set_blocks]
+        for block in [self.block1, self.block2, self.block3, self.block4]:
+            if [block[0] + 30, block[1]] in SET_BLOCKS:
+                return "right"
+            elif [block[0] - 30, block[1]] in SET_BLOCKS:
+                return "left"
+
 class i_block(allBlocks):
     def __init__(self, x_pos, y_pos):
         self.block1, self.block2, self.block3, self.block4 = [x_pos[0], y_pos[0]], [x_pos[1], y_pos[1]], [x_pos[2], y_pos[2]], [x_pos[3], y_pos[3]]
