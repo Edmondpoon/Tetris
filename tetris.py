@@ -24,17 +24,20 @@ WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
 
 def row_filled(set_blocks):
     highest_row = 20 - min([block[0][1] for block in set_blocks])
+    removed_rows = []
     for y_value in [y * 30 for y in range(highest_row, 20)]:
-        
-
-def side_collision(current_block, set_blocks):
-    SELF = current_block[0]
-    SET_BLOCKS = [block[0] for block in set_blocks]
-    for block in [SELF.block1, SELF.block2, SELF.block3, SELF.block4]:
-        if [block[0] + 30, block[1]] in SET_BLOCKS:
-            return "right"
-        elif [block[0] - 30, block[1]] in SET_BLOCKS:
-            return "left"
+        if len([True for block in set_blocks if block[0][1] == y_value]) == 10:
+            removed_rows.append(y_value)
+    for y_value in removed_rows:
+        removed_blocks = []
+        for block in set_blocks:
+            if block[0][1] == y_value:
+                removed_blocks.append(block)
+        for block in removed_blocks:
+            set_blocks.remove(block)
+        for block in set_blocks:
+            if block[0][1] < y_value:
+                block[0][1] += 30
 
 def underneath(current_block, set_blocks):
     SELF = current_block[0]
@@ -55,27 +58,31 @@ def board(window, piece_size, current_block, set_blocks, future_blocks):
         first_future = future_blocks[0]
         second_future = future_blocks[1]
         third_future = future_blocks[2]
-        placements = {BLUE : {1 : [[463, 463, 479, 495], [115, 131, 131, 131]], 2 : [[463, 463, 479, 495], [160, 176, 176, 176]], 3 : [[463, 463, 479, 495], [205, 221, 221, 221]], 4 : []},
-                    SKY_BLUE : {1 : [[455, 471, 487, 503], [115 for _ in range(4)]], 2 : [[455, 471, 487, 503], [160 for _ in range(4)]], 3 : [[455, 471, 487, 503], [205 for _ in range(4)]], 4 : []},
-                    ORANGE : {1 : [[463, 479, 495, 495], [131, 131, 131, 115]], 2 : [[463, 479, 495, 495], [176, 176, 176, 160]], 3 : [[463, 479, 495, 495], [221, 221, 221, 205]], 4 : []},
-                    YELLOW : {1 : [[471, 471, 487, 487], [131, 115, 131, 115]], 2 : [[471, 471, 487, 487], [176, 160, 176, 160]], 3 : [[471, 471, 487, 487], [221, 205, 221, 205]], 4 : []},
-                    GREEN : {1 : [[463, 479, 479, 495], [131, 115, 131, 115]], 2 : [[463, 479, 479, 495], [176, 160, 176, 160]], 3 : [[463, 479, 479, 495], [221, 205, 221, 205]], 4 : []},
-                    PURPLE : {1 : [[463, 479, 479, 495], [131, 115, 131, 131]], 2 : [[463, 479, 479, 495], [176, 160, 176, 176]], 3 : [[463, 479, 479, 495], [221, 205, 221, 205]], 4 : []},
-                    RED : {1 : [[463, 479, 479, 495], [115, 115, 131, 131]], 2 : [[463, 479, 479, 495], [160, 160, 176, 176]], 3 : [[463, 479, 479, 495], [205, 205, 221, 221]], 4 : []}}
+        placements = {BLUE : {1 : [[463, 463, 479, 495], [115, 131, 131, 131]], 2 : [[463, 463, 479, 495], [176, 192, 192, 192]], 3 : [[463, 463, 479, 495], [237, 253, 253, 253]], 4 : []},
+                    SKY_BLUE : {1 : [[455, 471, 487, 503], [115 for _ in range(4)]], 2 : [[455, 471, 487, 503], [176 for _ in range(4)]], 3 : [[455, 471, 487, 503], [237 for _ in range(4)]], 4 : []},
+                    ORANGE : {1 : [[463, 479, 495, 495], [131, 131, 131, 115]], 2 : [[463, 479, 495, 495], [192, 192, 192, 176]], 3 : [[463, 479, 495, 495], [253, 253, 253, 237]], 4 : []},
+                    YELLOW : {1 : [[471, 471, 487, 487], [131, 115, 131, 115]], 2 : [[471, 471, 487, 487], [192, 176, 192, 176]], 3 : [[471, 471, 487, 487], [253, 237, 253, 237]], 4 : []},
+                    GREEN : {1 : [[463, 479, 479, 495], [131, 115, 131, 115]], 2 : [[463, 479, 479, 495], [192, 176, 192, 176]], 3 : [[463, 479, 479, 495], [253, 237, 253, 237]], 4 : []},
+                    PURPLE : {1 : [[463, 479, 479, 495], [131, 115, 131, 131]], 2 : [[463, 479, 479, 495], [192, 176, 192, 192]], 3 : [[463, 479, 479, 495], [253, 237, 253, 253]], 4 : []},
+                    RED : {1 : [[463, 479, 479, 495], [115, 115, 131, 131]], 2 : [[463, 479, 479, 495], [176, 176, 192, 192]], 3 : [[463, 479, 479, 495], [237, 237, 253, 253]], 4 : []}}
         for block in range(4):
             pygame.draw.rect(window, first_future.color, (placements[first_future.color][1][0][block], placements[first_future.color][1][1][block], 15, 15))
-            if second_future.color == SKY_BLUE:
-                pygame.draw.rect(window, SKY_BLUE, (placements[SKY_BLUE][2][0][block], placements[SKY_BLUE][2][1][block], 15, 15))
+            if [first_future.color, second_future.color, third_future.color] == [SKY_BLUE for _ in range(3)]:
+                pygame.draw.rect(window, second_future.color, (placements[second_future.color][2][0][block], placements[second_future.color][2][1][block] - 15, 15, 15))
+                pygame.draw.rect(window, third_future.color, (placements[third_future.color][3][0][block], placements[third_future.color][3][1][block] - 30, 15, 15))
+            elif [first_future.color, second_future.color] == [SKY_BLUE, SKY_BLUE]:
+                pygame.draw.rect(window, second_future.color, (placements[second_future.color][2][0][block], placements[second_future.color][2][1][block] - 15, 15, 15))
+                pygame.draw.rect(window, third_future.color, (placements[third_future.color][3][0][block], placements[third_future.color][3][1][block] - 30, 15, 15))
             elif first_future.color == SKY_BLUE:
                 pygame.draw.rect(window, second_future.color, (placements[second_future.color][2][0][block], placements[second_future.color][2][1][block] - 15, 15, 15))
+                pygame.draw.rect(window, third_future.color, (placements[third_future.color][3][0][block], placements[third_future.color][3][1][block] - 15, 15, 15))
+            elif second_future.color == SKY_BLUE: 
+                pygame.draw.rect(window, second_future.color, (placements[second_future.color][2][0][block], placements[second_future.color][2][1][block], 15, 15))
+                pygame.draw.rect(window, third_future.color, (placements[third_future.color][3][0][block], placements[third_future.color][3][1][block] - 15, 15, 15))
             else:
                 pygame.draw.rect(window, second_future.color, (placements[second_future.color][2][0][block], placements[second_future.color][2][1][block], 15, 15))
-            if third_future.color == SKY_BLUE:
-                pygame.draw.rect(window, SKY_BLUE, (placements[SKY_BLUE][3][0][block], placements[SKY_BLUE][3][1][block], 15, 15))
-            elif second_future.color == SKY_BLUE:
-                pygame.draw.rect(window, third_future.color, (placements[third_future.color][3][0][block], placements[third_future.color][3][1][block] - 15, 15, 15))
-            else: 
                 pygame.draw.rect(window, third_future.color, (placements[third_future.color][3][0][block], placements[third_future.color][3][1][block], 15, 15))
+
 
     for block in set_blocks:
         pygame.draw.rect(window, block[1], (block[0][0] + 1, block[0][1] + 1, 29, 29))
@@ -139,6 +146,8 @@ def changePosition(current_pos, current_block):
                 blocks[pos][axis] += (POSITION[current_pos][pos][axis] - blocks[pos][axis])
 
 def main():
+    DEBUG_MODE = True
+    DEBUG_PAUSE = False
     RUN = True
     CURRENT_BLOCK = []
     FUTURE_BLOCKS = []
@@ -177,12 +186,18 @@ def main():
             CURRENT_BLOCK = [FUTURE_BLOCKS[0]]
             FUTURE_BLOCKS.pop(0)
 
+        #DEBUG MODE
+        if pygame.mouse.get_pressed()[0] and DEBUG_MODE:
+            x, y =pygame.mouse.get_pos()
+            print(x, y)
+        if keys[pygame.K_p] and DEBUG_MODE:
+            if DEBUG_PAUSE:
+                DEBUG_PAUSE = False
+            else:
+                DEBUG_PAUSE = True
 
-        #if pygame.mouse.get_pressed()[0]:
-         #   x, y =pygame.mouse.get_pos()
-          #  print(x, y)
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            if side_collision(CURRENT_BLOCK, SET_BLOCKS) == "left":
+            if CURRENT_BLOCK[0].side_collision(SET_BLOCKS) == "left":
                 pass
             elif min([block[0] for block in [CURRENT_BLOCK[0].block1, CURRENT_BLOCK[0].block2, CURRENT_BLOCK[0].block3, CURRENT_BLOCK[0].block4]]) - 30 >= 125 and movement >= 5:
                 for block in [CURRENT_BLOCK[0].block1, CURRENT_BLOCK[0].block2, CURRENT_BLOCK[0].block3, CURRENT_BLOCK[0].block4]:
@@ -192,7 +207,7 @@ def main():
             else:
                 movement += 1
         elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            if side_collision(CURRENT_BLOCK, SET_BLOCKS) == "right":
+            if CURRENT_BLOCK[0].side_collision(SET_BLOCKS) == "right":
                 pass
             elif max([block[0] for block in [CURRENT_BLOCK[0].block1, CURRENT_BLOCK[0].block2, CURRENT_BLOCK[0].block3, CURRENT_BLOCK[0].block4]]) + 30 < 425 and movement >= 5:
                 for block in [CURRENT_BLOCK[0].block1, CURRENT_BLOCK[0].block2, CURRENT_BLOCK[0].block3, CURRENT_BLOCK[0].block4]:
@@ -202,10 +217,10 @@ def main():
             else:
                 movement += 1
         elif keys[pygame.K_UP] or keys[pygame.K_w]:
-            if current_pos == 4 and delta_position >= 5:
+            if current_pos == 4 and delta_position >= 3:
                 current_pos = 1
                 delta_position = 0
-            elif delta_position >= 5:
+            elif delta_position >= 3:
                 current_pos += 1
                 delta_position = 0
             else:
@@ -214,7 +229,7 @@ def main():
         elif keys[pygame.K_DOWN] or keys[pygame.K_s]:
             timer += 8
         elif keys[pygame.K_SPACE]:
-            if gravity >= 6:
+            if gravity >= 4:
                 SELF = CURRENT_BLOCK[0]
                 while not underneath(CURRENT_BLOCK, SET_BLOCKS) and max([block[1] for block in [SELF.block1, SELF.block2, SELF.block3, SELF.block4]]) + 30 <= 570:
                     for block in [SELF.block1, SELF.block2, SELF.block3, SELF.block4]:
@@ -225,10 +240,12 @@ def main():
                 CURRENT_BLOCK = [FUTURE_BLOCKS[0]]
                 FUTURE_BLOCKS.pop(0)
                 gravity = 0
+                current_pos = 1
+                row_filled(SET_BLOCKS)
             else:
                 gravity +=1
-
-        if timer >= 50:
+        
+        if timer >= 50 and not DEBUG_PAUSE:
             if fall(CURRENT_BLOCK, SET_BLOCKS):
                 current_pos = 1
                 row_filled(SET_BLOCKS)
