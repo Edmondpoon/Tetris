@@ -9,22 +9,6 @@ pygame.init()
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Tetris")
 
-def pick_block(color):
-    if color == SKY_BLUE:
-        return piece.i_block([275, 275 -  30, 275 - 60, 275 + 30], [0 for _ in range(4)])
-    elif color == BLUE:
-        return piece.j_block([245, 245 - 30, 245 + 30, 245 + 30], [30, 30, 30, 0])
-    elif color == ORANGE:
-        return piece.l_block([245, 245 + 30, 245 - 30,  245 - 30], [30, 30, 30, 0])
-    elif color == YELLOW:
-        return piece.o_block([275, 275, 275 - 30, 275 - 30], [30, 0, 30, 0])
-    elif color == GREEN:
-        return piece.t_block([245, 245, 245 - 30, 245 + 30], [0, 30, 30, 30])
-    elif color == PURPLE:
-        return piece.z_block([245, 245, 245 - 30, 245 + 30], [30, 0, 0, 30])
-    elif color == RED:
-        return piece.s_block([245, 245, 245 - 30, 245 + 30], [30, 0, 30, 0])
-
 def main():
 
     #DEBUG mode
@@ -34,8 +18,8 @@ def main():
     #movement related variables
     timer = 40
     movement = 0
-    delta_position = 0
-    gravity = 0
+    delta_position = 1
+    gravity = 1
 
     #oher variables
     RUN = True
@@ -54,24 +38,24 @@ def main():
 
         #chooses the first block
         if not current_block:
-            current_block = pick_block(random.choice([SKY_BLUE, BLUE, ORANGE, YELLOW, GREEN, PURPLE, RED]))
+            current_block = piece.pick_block(random.choice([SKY_BLUE, BLUE, ORANGE, YELLOW, GREEN, PURPLE, RED]))
             blocks_list = [current_block.block1, current_block.block2, current_block.block3, current_block.block4]
 
         #randomly chooses the next 3 future blocks
         if len(future_blocks) != 3:
             eight_sided_rolls = [random.choice([SKY_BLUE, BLUE, ORANGE, YELLOW, GREEN, PURPLE, RED, "reroll"]) for roll in range(3)]
             if future_blocks and eight_sided_rolls[0] not in ["reroll", current_block.color]:
-                future_blocks.append(pick_block(eight_sided_rolls[0]))
+                future_blocks.append(piece.pick_block(eight_sided_rolls[0]))
             elif not future_blocks:
-                future_blocks.append(pick_block(random.choice([SKY_BLUE, BLUE, ORANGE, YELLOW, GREEN, PURPLE, RED])))
+                future_blocks.append(piece.pick_block(random.choice([SKY_BLUE, BLUE, ORANGE, YELLOW, GREEN, PURPLE, RED])))
             if len(future_blocks) == 1 and eight_sided_rolls[1] not in ["reroll", future_blocks[0].color]:
-                future_blocks.append(pick_block(eight_sided_rolls[1]))
+                future_blocks.append(piece.pick_block(eight_sided_rolls[1]))
             elif len(future_blocks) == 1:
-                future_blocks.append(pick_block(random.choice([SKY_BLUE, BLUE, ORANGE, YELLOW, GREEN, PURPLE, RED])))
+                future_blocks.append(piece.pick_block(random.choice([SKY_BLUE, BLUE, ORANGE, YELLOW, GREEN, PURPLE, RED])))
             if len(future_blocks) == 2 and eight_sided_rolls[2] not in ["reroll", future_blocks[1].color]:
-                future_blocks.append(pick_block(eight_sided_rolls[2]))
+                future_blocks.append(piece.pick_block(eight_sided_rolls[2]))
             elif len(future_blocks) == 2:
-                future_blocks.append(pick_block(random.choice([SKY_BLUE, BLUE, ORANGE, YELLOW, GREEN, PURPLE, RED])))
+                future_blocks.append(piece.pick_block(random.choice([SKY_BLUE, BLUE, ORANGE, YELLOW, GREEN, PURPLE, RED])))
 
         #DEBUG MODE
         if pygame.mouse.get_pressed()[0] and DEBUG_MODE:
@@ -117,11 +101,10 @@ def main():
             timer += 8
         elif keys[pygame.K_SPACE]:
             if gravity >= 4:
-                SELF = current_block
                 while not current_block.underneath(set_blocks) and max([block[1] for block in blocks_list]) + 30 <= 570:
                     for block in blocks_list:
                         block[1] += 30
-                for block in [[blocks_list[index], SELF.color] for index in range(4)]:
+                for block in [[blocks_list[index], current_block.color] for index in range(4)]:
                     set_blocks.append(block)
                 current_block = future_blocks[0]
                 blocks_list = [current_block.block1, current_block.block2, current_block.block3, current_block.block4]
