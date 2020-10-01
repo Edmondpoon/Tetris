@@ -3,6 +3,8 @@ from constants import BLACK, BLUE, SKY_BLUE, ORANGE, YELLOW, GREEN, PURPLE, RED,
 
 pygame.init()
 FONT = pygame.font.SysFont("comicsans", 40)
+FONT2 = pygame.font.SysFont("comicsans", 35)
+FONT3 = pygame.font.SysFont("comicsans", 30)
 
 #clears rows that are filled
 def row_filled(set_blocks):
@@ -25,15 +27,34 @@ def row_filled(set_blocks):
         for block in set_blocks:
             if block[0][1] < y_value:
                 block[0][1] += 30
+    return [True, len(removed_rows)] if removed_rows else [False, None]
 
 #generates the board and configures the window
-def board_(window, piece_size, current_block, set_blocks, future_blocks):
+def board_(window, piece_size, current_block, set_blocks, future_blocks, score, level, rows_cleared):
     window.fill(BLACK)
 
     #sets up all the text present on the window
     NEXT_TEXT = FONT.render("NEXT", True, WHITE)
-    window.blit(NEXT_TEXT, (450, 50))
+    SCORE_TEXT = FONT2.render("SCORE", True, WHITE)
+    LEVEL_TEXT = FONT2.render("LEVEL", True, WHITE)
+    LINES_TEXT = FONT2.render("LINES", True, WHITE)
+
+    TSCORE_TEXT = FONT3.render(str(score), True, GREY)
+    TLEVEL_TEXT = FONT3.render(str(level + 1), True, GREY)
+    TLINES_TEXT = FONT3.render(str(rows_cleared), True, GREY)
+
     pygame.draw.rect(window, WHITE, (445, 90, 85, 200), 2)
+    pygame.draw.rect(window, WHITE, (15, 350, 100, 220), 2)
+
+    window.blit(NEXT_TEXT, (450, 50))
+    window.blit(SCORE_TEXT, (22, 360))
+    window.blit(LEVEL_TEXT, (25, 430))
+    window.blit(LINES_TEXT, (27, 500))
+
+    number_placement = {1 : 55, 2 : 50, 3 : 45, 4 : 40, 5 : 35, 6 : 30, 7 : 25, 8 : 20}
+    window.blit(TSCORE_TEXT, (number_placement[len(str(score))], 395))
+    window.blit(TLEVEL_TEXT, (number_placement[len(str(level))], 465))
+    window.blit(TLINES_TEXT, (number_placement[len(str(rows_cleared))], 535))
 
     #draws the future blocks in the "next blocks" section
     if len(future_blocks) == 3:

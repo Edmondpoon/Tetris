@@ -1,4 +1,5 @@
 import pygame
+import scores
 from constants import *
 import board
 import pieces as piece
@@ -20,14 +21,19 @@ def main():
     movement = 0
     delta_position = 1
     gravity = 1
+    current_pos = 1
 
-    #oher variables
+    #point system
+    level = 0
+    rows_cleared = 0
+    score = 0
+
+    #other variables
     RUN = True
     current_block = None
     blocks_list = None
     future_blocks = []
     set_blocks = []
-    current_pos = 1
 
     while RUN:
 
@@ -46,6 +52,8 @@ def main():
             eight_sided_rolls = [random.choice([SKY_BLUE, BLUE, ORANGE, YELLOW, GREEN, PURPLE, RED, "reroll"]) for roll in range(3)]
             if future_blocks and eight_sided_rolls[0] not in ["reroll", current_block.color]:
                 future_blocks.append(piece.pick_block(eight_sided_rolls[0]))
+            elif future_blocks:
+                future_blocks.append(piece.pick_block(random.choice([SKY_BLUE, BLUE, ORANGE, YELLOW, GREEN, PURPLE, RED])))
             elif not future_blocks:
                 future_blocks.append(piece.pick_block(random.choice([SKY_BLUE, BLUE, ORANGE, YELLOW, GREEN, PURPLE, RED])))
             if len(future_blocks) == 1 and eight_sided_rolls[1] not in ["reroll", future_blocks[0].color]:
@@ -111,7 +119,11 @@ def main():
                 future_blocks.pop(0)
                 gravity = 0
                 current_pos = 1
-                board.row_filled(set_blocks)
+                delta_rows = board.row_filled(set_blocks)
+                if delta_rows[0]:
+                    rows_cleared += delta_rows[1]
+                level = rows_cleared // 10
+                score = scores.score_change(level, delta_rows[1], score)
             else:
                 gravity +=1
 
@@ -120,7 +132,11 @@ def main():
                 current_pos = 1
                 current_block = None
                 blocks_list = None
-                board.row_filled(set_blocks)
+                delta_rows = board.row_filled(set_blocks)
+                if delta_rows[0]:
+                    rows_cleared += delta_rows[1]
+                level = rows_cleared // 10
+                score = scores.score_change(level, delta_rows[1], score)
                 current_block = future_blocks[0]
                 future_blocks.pop(0)
                 blocks_list = [current_block.block1, current_block.block2, current_block.block3, current_block.block4]
@@ -130,7 +146,7 @@ def main():
         else:
             timer += 1
 
-        board.board_(WINDOW, PIECE_SIZE, current_block, set_blocks, future_blocks)
+        board.board_(WINDOW, PIECE_SIZE, current_block, set_blocks, future_blocks, score, level, rows_cleared)
         clock.tick(60)
 
     pygame.quit()
