@@ -18,6 +18,11 @@ def pick_block(color):
         return s_block([245, 245, 245 - 30, 245 + 30], [30, 0, 30, 0])
 
 class allBlocks():
+    def __init__(self, x_pos, y_pos):
+        self.block1, self.block2, self.block3, self.block4 = [x_pos[0], y_pos[0]], [x_pos[1], y_pos[1]], [x_pos[2], y_pos[2]], [x_pos[3], y_pos[3]]
+        self.blocks = [self.block1, self.block2, self.block3, self.block4]
+        self.xreset = x_pos
+        self.yreset = y_pos
 
     #draws the block
     def draw(self, window):
@@ -109,52 +114,51 @@ class allBlocks():
                     self.POR[0] += change_in_POR[self.color]
         return False
 
+    def reset(self):
+        self.block1, self.block2, self.block3, self.block4 = [self.xreset[0], self.yreset[0]], [self.xreset[1], self.yreset[1]], [self.xreset[2], self.yreset[2]], [self.xreset[3], self.yreset[3]]
+        self.blocks = [self.block1, self.block2, self.block3, self.block4]
+        self.POR = [self.xreset[0], 30]
+
+
 class i_block(allBlocks):
     def __init__(self, x_pos, y_pos):
-        self.block1, self.block2, self.block3, self.block4 = [x_pos[0], y_pos[0]], [x_pos[1], y_pos[1]], [x_pos[2], y_pos[2]], [x_pos[3], y_pos[3]]
-        self.blocks = [self.block1, self.block2, self.block3, self.block4]
+        super().__init__(x_pos, y_pos)
         self.color = SKY_BLUE
         self.POR = [x_pos[0], 30]
 
 class j_block(allBlocks):
     def __init__(self, x_pos, y_pos):
-        self.block1, self.block2, self.block3, self.block4 = [x_pos[0], y_pos[0]], [x_pos[1], y_pos[1]], [x_pos[2], y_pos[2]], [x_pos[3], y_pos[3]]
-        self.blocks = [self.block1, self.block2, self.block3, self.block4]
+        super().__init__(x_pos, y_pos)
         self.color = ORANGE
         self.POR = [x_pos[0], 30]
 
 class l_block(allBlocks):
     def __init__(self, x_pos, y_pos):
-        self.block1, self.block2, self.block3, self.block4 = [x_pos[0], y_pos[0]], [x_pos[1], y_pos[1]], [x_pos[2], y_pos[2]], [x_pos[3], y_pos[3]]
-        self.blocks = [self.block1, self.block2, self.block3, self.block4]
+        super().__init__(x_pos, y_pos)
         self.color = BLUE
         self.POR = [x_pos[0], 30]
 
 class o_block(allBlocks):
     def __init__(self, x_pos, y_pos):
-        self.block1, self.block2, self.block3, self.block4 = [x_pos[0], y_pos[0]], [x_pos[1], y_pos[1]], [x_pos[2], y_pos[2]], [x_pos[3], y_pos[3]]
-        self.blocks = [self.block1, self.block2, self.block3, self.block4]
+        super().__init__(x_pos, y_pos)
         self.color = YELLOW
         self.POR = [x_pos[0], 30]
 
 class s_block(allBlocks):
     def __init__(self, x_pos, y_pos):
-        self.block1, self.block2, self.block3, self.block4 = [x_pos[0], y_pos[0]], [x_pos[1], y_pos[1]], [x_pos[2], y_pos[2]], [x_pos[3], y_pos[3]]
-        self.blocks = [self.block1, self.block2, self.block3, self.block4]
+        super().__init__(x_pos, y_pos)
         self.color = GREEN
         self.POR = [x_pos[0], 30]
 
 class t_block(allBlocks):
     def __init__(self, x_pos, y_pos):
-        self.block1, self.block2, self.block3, self.block4 = [x_pos[0], y_pos[0]], [x_pos[1], y_pos[1]], [x_pos[2], y_pos[2]], [x_pos[3], y_pos[3]]
-        self.blocks = [self.block1, self.block2, self.block3, self.block4]
+        super().__init__(x_pos, y_pos)
         self.color = PURPLE
         self.POR = [x_pos[0], 30]
 
 class z_block(allBlocks):
     def __init__(self, x_pos, y_pos):
-        self.block1, self.block2, self.block3, self.block4 = [x_pos[0], y_pos[0]], [x_pos[1], y_pos[1]], [x_pos[2], y_pos[2]], [x_pos[3], y_pos[3]]
-        self.blocks = [self.block1, self.block2, self.block3, self.block4]
+        super().__init__(x_pos, y_pos)
         self.color = RED
         self.POR = [x_pos[0], 30]
 
