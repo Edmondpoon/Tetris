@@ -22,6 +22,7 @@ def main():
     delta_position = 1
     gravity = 1
     current_pos = 1
+    block_switch = 1
 
     #point system
     level = 0
@@ -34,6 +35,7 @@ def main():
     blocks_list = None
     future_blocks = []
     set_blocks = []
+    held_block = [None, False]
 
     while RUN:
 
@@ -56,13 +58,13 @@ def main():
                 future_blocks.append(piece.pick_block(random.choice([SKY_BLUE, BLUE, ORANGE, YELLOW, GREEN, PURPLE, RED])))
             elif not future_blocks:
                 future_blocks.append(piece.pick_block(random.choice([SKY_BLUE, BLUE, ORANGE, YELLOW, GREEN, PURPLE, RED])))
-            if len(future_blocks) == 1 and eight_sided_rolls[1] not in ["reroll", future_blocks[0].color]:
+            if len(future_blocks) == 1 and eight_sided_rolls[1] not in ["reroll", future_blocks[0].color] and len(future_blocks) != 3:
                 future_blocks.append(piece.pick_block(eight_sided_rolls[1]))
-            elif len(future_blocks) == 1:
+            elif len(future_blocks) == 1 and len(future_blocks) != 3:
                 future_blocks.append(piece.pick_block(random.choice([SKY_BLUE, BLUE, ORANGE, YELLOW, GREEN, PURPLE, RED])))
-            if len(future_blocks) == 2 and eight_sided_rolls[2] not in ["reroll", future_blocks[1].color]:
+            if len(future_blocks) == 2 and eight_sided_rolls[2] not in ["reroll", future_blocks[1].color] and len(future_blocks) != 3:
                 future_blocks.append(piece.pick_block(eight_sided_rolls[2]))
-            elif len(future_blocks) == 2:
+            elif len(future_blocks) == 2 and len(future_blocks) != 3:
                 future_blocks.append(piece.pick_block(random.choice([SKY_BLUE, BLUE, ORANGE, YELLOW, GREEN, PURPLE, RED])))
 
         #DEBUG MODE
@@ -124,8 +126,21 @@ def main():
                     rows_cleared += delta_rows[1]
                 level = rows_cleared // 10
                 score = scores.score_change(level, delta_rows[1], score)
+                held_block[1] = False
             else:
                 gravity +=1
+        elif keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]:
+            if held_block[0] and not held_block[1] and block_switch >= 4:
+                held_block, current_block = [current_block, True], held_block[0]
+                current_block.reset()
+                held_block[0].reset()
+                blocks_list = [current_block.block1, current_block.block2, current_block.block3, current_block.block4]
+            elif held_block[0] and not held_block[1]:
+                block_switch += 1
+            elif not held_block[0]:
+                held_block, current_block = [current_block, True], future_blocks[0]
+                blocks_list = [current_block.block1, current_block.block2, current_block.block3, current_block.block4]
+                future_blocks.pop(0)  
 
         if timer >= 50 and not DEBUG_PAUSE:
             if current_block.fall(set_blocks, current_block):
@@ -140,13 +155,14 @@ def main():
                 current_block = future_blocks[0]
                 future_blocks.pop(0)
                 blocks_list = [current_block.block1, current_block.block2, current_block.block3, current_block.block4]
+                held_block[1] = False
             else:
                 current_block.POR[1] += 30
             timer = 0
         else:
             timer += 1
 
-        board.board_(WINDOW, PIECE_SIZE, current_block, set_blocks, future_blocks, score, level, rows_cleared)
+        board.board_(WINDOW, PIECE_SIZE, current_block, set_blocks, future_blocks, score, level, rows_cleared, held_block)
         clock.tick(60)
 
     pygame.quit()

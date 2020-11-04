@@ -30,11 +30,12 @@ def row_filled(set_blocks):
     return [True, len(removed_rows)] if removed_rows else [False, None]
 
 #generates the board and configures the window
-def board_(window, piece_size, current_block, set_blocks, future_blocks, score, level, rows_cleared):
+def board_(window, piece_size, current_block, set_blocks, future_blocks, score, level, rows_cleared, held_block):
     window.fill(BLACK)
 
     #sets up all the text present on the window
     NEXT_TEXT = FONT.render("NEXT", True, WHITE)
+    HOLD_TEXT = FONT.render("HOLD", True, WHITE)
     SCORE_TEXT = FONT2.render("SCORE", True, WHITE)
     LEVEL_TEXT = FONT2.render("LEVEL", True, WHITE)
     LINES_TEXT = FONT2.render("LINES", True, WHITE)
@@ -45,8 +46,10 @@ def board_(window, piece_size, current_block, set_blocks, future_blocks, score, 
 
     pygame.draw.rect(window, WHITE, (445, 90, 85, 200), 2)
     pygame.draw.rect(window, WHITE, (15, 350, 100, 220), 2)
+    pygame.draw.rect(window, WHITE, (21, 90, 90, 60), 2)
 
     window.blit(NEXT_TEXT, (450, 50))
+    window.blit(HOLD_TEXT, (25, 50))
     window.blit(SCORE_TEXT, (22, 360))
     window.blit(LEVEL_TEXT, (25, 430))
     window.blit(LINES_TEXT, (27, 500))
@@ -61,13 +64,13 @@ def board_(window, piece_size, current_block, set_blocks, future_blocks, score, 
         first_future = future_blocks[0]
         second_future = future_blocks[1]
         third_future = future_blocks[2]
-        placements = {BLUE : {1 : [[463, 463, 479, 495], [115, 131, 131, 131]], 2 : [[463, 463, 479, 495], [176, 192, 192, 192]], 3 : [[463, 463, 479, 495], [237, 253, 253, 253]], 4 : []},
-                    SKY_BLUE : {1 : [[455, 471, 487, 503], [115 for _ in range(4)]], 2 : [[455, 471, 487, 503], [176 for _ in range(4)]], 3 : [[455, 471, 487, 503], [237 for _ in range(4)]], 4 : []},
-                    ORANGE : {1 : [[463, 479, 495, 495], [131, 131, 131, 115]], 2 : [[463, 479, 495, 495], [192, 192, 192, 176]], 3 : [[463, 479, 495, 495], [253, 253, 253, 237]], 4 : []},
-                    YELLOW : {1 : [[471, 471, 487, 487], [131, 115, 131, 115]], 2 : [[471, 471, 487, 487], [192, 176, 192, 176]], 3 : [[471, 471, 487, 487], [253, 237, 253, 237]], 4 : []},
-                    GREEN : {1 : [[463, 479, 479, 495], [131, 115, 131, 115]], 2 : [[463, 479, 479, 495], [192, 176, 192, 176]], 3 : [[463, 479, 479, 495], [253, 237, 253, 237]], 4 : []},
-                    PURPLE : {1 : [[463, 479, 479, 495], [131, 115, 131, 131]], 2 : [[463, 479, 479, 495], [192, 176, 192, 192]], 3 : [[463, 479, 479, 495], [253, 237, 253, 253]], 4 : []},
-                    RED : {1 : [[463, 479, 479, 495], [115, 115, 131, 131]], 2 : [[463, 479, 479, 495], [176, 176, 192, 192]], 3 : [[463, 479, 479, 495], [237, 237, 253, 253]], 4 : []}}
+        placements = {BLUE : {1 : [[463, 463, 479, 495], [115, 131, 131, 131]], 2 : [[463, 463, 479, 495], [176, 192, 192, 192]], 3 : [[463, 463, 479, 495], [237, 253, 253, 253]]},
+                    SKY_BLUE : {1 : [[455, 471, 487, 503], [115 for _ in range(4)]], 2 : [[455, 471, 487, 503], [176 for _ in range(4)]], 3 : [[455, 471, 487, 503], [237 for _ in range(4)]]},
+                    ORANGE : {1 : [[463, 479, 495, 495], [131, 131, 131, 115]], 2 : [[463, 479, 495, 495], [192, 192, 192, 176]], 3 : [[463, 479, 495, 495], [253, 253, 253, 237]]},
+                    YELLOW : {1 : [[471, 471, 487, 487], [131, 115, 131, 115]], 2 : [[471, 471, 487, 487], [192, 176, 192, 176]], 3 : [[471, 471, 487, 487], [253, 237, 253, 237]]},
+                    GREEN : {1 : [[463, 479, 479, 495], [131, 115, 131, 115]], 2 : [[463, 479, 479, 495], [192, 176, 192, 176]], 3 : [[463, 479, 479, 495], [253, 237, 253, 237]]},
+                    PURPLE : {1 : [[463, 479, 479, 495], [131, 115, 131, 131]], 2 : [[463, 479, 479, 495], [192, 176, 192, 192]], 3 : [[463, 479, 479, 495], [253, 237, 253, 253]]},
+                    RED : {1 : [[463, 479, 479, 495], [115, 115, 131, 131]], 2 : [[463, 479, 479, 495], [176, 176, 192, 192]], 3 : [[463, 479, 479, 495], [237, 237, 253, 253]]}}
 
         #draws each future block depending on whether its the first, second, or third block
         for block in range(4):
@@ -87,6 +90,18 @@ def board_(window, piece_size, current_block, set_blocks, future_blocks, score, 
             else:
                 pygame.draw.rect(window, second_future.color, (placements[second_future.color][2][0][block], placements[second_future.color][2][1][block], 15, 15))
                 pygame.draw.rect(window, third_future.color, (placements[third_future.color][3][0][block], placements[third_future.color][3][1][block], 15, 15))
+
+    #draws the held block if applicable
+    placements = {BLUE : [[37, 37, 57, 77], [100, 120, 120, 120]],
+                SKY_BLUE : [[27, 47, 67, 87], [110, 110, 110, 110]],
+                ORANGE : [[37, 57, 77, 77], [120, 120, 120, 100]],
+                YELLOW : [[47, 47, 67, 67], [120, 100, 120, 100]],
+                GREEN : [[37, 57, 57, 77], [120, 100, 120, 100]],
+                PURPLE : [[37, 57, 57, 77], [120, 100, 120, 120]],
+                RED : [[37, 57, 57, 77], [100, 100, 120, 120]]}
+    if held_block[0]:
+        for block in range(4):
+            pygame.draw.rect(window, held_block[0].color, (placements[held_block[0].color][0][block], placements[held_block[0].color][1][block], 19, 19))
 
     #draws all the blocks that have been placed
     for block in set_blocks:
