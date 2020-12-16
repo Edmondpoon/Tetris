@@ -33,9 +33,9 @@ def main():
     RUN = True
     current_block = None
     blocks_list = None
-    future_blocks = []
-    set_blocks = []
-    held_block = [None, False]
+    future_blocks = [] #list of 3 future blocks
+    set_blocks = [] #list of all set blocks
+    held_block = [None, False] #list of block and whether it has been swapped this turn
 
     while RUN:
 
@@ -116,17 +116,20 @@ def main():
                         block[1] += 30
                 for block in [[blocks_list[index], current_block.color] for index in range(4)]:
                     set_blocks.append(block)
-                current_block = future_blocks[0]
-                blocks_list = [current_block.block1, current_block.block2, current_block.block3, current_block.block4]
-                future_blocks.pop(0)
-                gravity = 0
-                current_pos = 1
-                delta_rows = board.row_filled(set_blocks)
-                if delta_rows[0]:
-                    rows_cleared += delta_rows[1]
-                level = rows_cleared // 10
-                score = scores.score_change(level, delta_rows[1], score)
-                held_block[1] = False
+                if piece.end_game(set_blocks, future_blocks[0].blocks):
+                    RUN = False
+                else:
+                    current_block = future_blocks[0]
+                    blocks_list = [current_block.block1, current_block.block2, current_block.block3, current_block.block4]
+                    future_blocks.pop(0)
+                    gravity = 0
+                    current_pos = 1
+                    delta_rows = board.row_filled(set_blocks)
+                    if delta_rows[0]:
+                        rows_cleared += delta_rows[1]
+                    level = rows_cleared // 10
+                    score = scores.score_change(level, delta_rows[1], score)
+                    held_block[1] = False
             else:
                 gravity +=1
         elif keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]:
@@ -152,10 +155,13 @@ def main():
                     rows_cleared += delta_rows[1]
                 level = rows_cleared // 10
                 score = scores.score_change(level, delta_rows[1], score)
-                current_block = future_blocks[0]
-                future_blocks.pop(0)
-                blocks_list = [current_block.block1, current_block.block2, current_block.block3, current_block.block4]
-                held_block[1] = False
+                if piece.end_game(set_blocks, future_blocks[0].blocks):
+                    RUN = False
+                else:
+                    current_block = future_blocks[0]
+                    future_blocks.pop(0)
+                    blocks_list = [current_block.block1, current_block.block2, current_block.block3, current_block.block4]
+                    held_block[1] = False
             else:
                 current_block.POR[1] += 30
             timer = 0
@@ -164,7 +170,11 @@ def main():
 
         board.board_(WINDOW, PIECE_SIZE, current_block, set_blocks, future_blocks, score, level, rows_cleared, held_block)
         clock.tick(60)
-
+    
+    print("You lost!")
+    print("""Score: {},
+Level: {},
+Rows Cleared: {}""".format(score, level, rows_cleared))
     pygame.quit()
 
 clock = pygame.time.Clock()
