@@ -17,6 +17,13 @@ def pick_block(color):
     elif color == RED:
         return s_block([245, 245, 245 - 30, 245 + 30], [30, 0, 30, 0])
 
+def end_game(set_blocks, current_block):
+    for block in current_block:
+        if block in [set_block[0] for set_block in set_blocks]:
+            return True
+    return False
+
+
 class allBlocks():
     def __init__(self, x_pos, y_pos):
         self.block1, self.block2, self.block3, self.block4 = [x_pos[0], y_pos[0]], [x_pos[1], y_pos[1]], [x_pos[2], y_pos[2]], [x_pos[3], y_pos[3]]
