@@ -147,7 +147,6 @@ def main():
                 future_blocks.pop(0)  
 
         if timer >= block_speed and not DEBUG_PAUSE:
-            #FIXME: add the speed change to whenever a row can be cleared (ie set block, drop block
             if current_block.fall(set_blocks, current_block):
                 current_pos = 1
                 current_block = None
