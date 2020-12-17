@@ -18,6 +18,7 @@ def main():
 
     #movement related variables
     timer = 40
+    block_speed = 73
     movement = 0
     delta_position = 1
     gravity = 1
@@ -36,7 +37,6 @@ def main():
     future_blocks = [] #list of 3 future blocks
     set_blocks = [] #list of all set blocks
     held_block = [None, False] #list of block and whether it has been swapped this turn
-
     while RUN:
 
         keys = pygame.key.get_pressed()
@@ -128,6 +128,7 @@ def main():
                     if delta_rows[0]:
                         rows_cleared += delta_rows[1]
                     level = rows_cleared // 10
+                    block_speed = (25 / ((level + 1)) * 0.5) + 13
                     score = scores.score_change(level, delta_rows[1], score)
                     held_block[1] = False
             else:
@@ -145,7 +146,7 @@ def main():
                 blocks_list = [current_block.block1, current_block.block2, current_block.block3, current_block.block4]
                 future_blocks.pop(0)  
 
-        if timer >= 50 and not DEBUG_PAUSE:
+        if timer >= block_speed and not DEBUG_PAUSE:
             if current_block.fall(set_blocks, current_block):
                 current_pos = 1
                 current_block = None
@@ -154,6 +155,7 @@ def main():
                 if delta_rows[0]:
                     rows_cleared += delta_rows[1]
                 level = rows_cleared // 10
+                block_speed = (25 / ((level + 1) * 0.5)) + 13
                 score = scores.score_change(level, delta_rows[1], score)
                 if piece.end_game(set_blocks, future_blocks[0].blocks):
                     RUN = False
@@ -167,7 +169,6 @@ def main():
             timer = 0
         else:
             timer += 1
-
         board.board_(WINDOW, PIECE_SIZE, current_block, set_blocks, future_blocks, score, level, rows_cleared, held_block)
         clock.tick(60)
     
