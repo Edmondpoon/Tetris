@@ -46,16 +46,24 @@ class allBlocks():
                 return "left"
 
     #checks if there is a block under the current block
-    def underneath(self, set_blocks):
-        SET_BLOCKS = [block[0] for block in set_blocks]
-        for block in self.blocks:
-            if [block[0], block[1] + 30] in SET_BLOCKS:
-                return True
-        return False
+    def underneath(self, set_blocks, outline):
+        if not outline:
+            SET_BLOCKS = [block[0] for block in set_blocks]
+            for block in self.blocks:
+                if [block[0], block[1] + 30] in SET_BLOCKS:
+                    return True
+            return False
+        else:
+            SET_BLOCKS = [block[0] for block in set_blocks]
+            for block in outline:
+                if [block[0], block[1] + 30] in SET_BLOCKS:
+                    return True
+            return False
+            
 
     #moves the block one space down unless it hits another block or reaches the bottom, where it will change the current block instead
-    def fall(self, set_blocks, current_block):
-        if not self.underneath(set_blocks):
+    def fall(self, set_blocks):
+        if not self.underneath(set_blocks, None):
             if max([block[1] for block in self.blocks]) + 30 <= 570:
                 for block in self.blocks:
                     block[1] += 30
@@ -68,6 +76,17 @@ class allBlocks():
             for block in [[self.blocks[index], self.color] for index in range(4)]:
                 set_blocks.append(block)
             return True
+
+    #draws the outline of the block if it were to be dropped at any given moment
+    def draw_outline(self, set_blocks, window):
+        outline_pos = [[block[0], block[1]] for block in self.blocks]
+        while not self.underneath(set_blocks, outline_pos) and max([block[1] for block in outline_pos]) + 30 <= 570:
+            for block in outline_pos:
+                block[1] += 30
+
+        for block in outline_pos:
+            pygame.draw.rect(window, self.color, (block[0] + 1, block[1] + 1, 29, 29), 1)
+        
 
     #changes the positions of the 4 blocks that comprise of the whole block
     def changePosition(self, current_pos, set_blocks):

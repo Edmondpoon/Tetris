@@ -128,4 +128,7 @@ def board_(window, piece_size, current_block, set_blocks, future_blocks, score, 
     if current_block:
         current_block.draw(window)
 
+    #draws placed block outline
+    if current_block:
+        current_block.draw_outline(set_blocks, window)
     pygame.display.update()
