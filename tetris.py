@@ -18,7 +18,7 @@ def main():
 
     #movement related variables
     timer = 40
-    block_speed = 73
+    block_speed = 75
     movement = 0
     delta_position = 1
     gravity = 1
@@ -111,7 +111,7 @@ def main():
             timer += 8
         elif keys[pygame.K_SPACE]:
             if gravity >= 4:
-                while not current_block.underneath(set_blocks) and max([block[1] for block in blocks_list]) + 30 <= 570:
+                while not current_block.underneath(set_blocks, None) and max([block[1] for block in blocks_list]) + 30 <= 570:
                     for block in blocks_list:
                         block[1] += 30
                 for block in [[blocks_list[index], current_block.color] for index in range(4)]:
@@ -128,7 +128,7 @@ def main():
                     if delta_rows[0]:
                         rows_cleared += delta_rows[1]
                     level = rows_cleared // 10
-                    block_speed = (25 / ((level + 1)) * 0.5) + 13
+                    block_speed = (25 / ((level + 1)) * 0.5) + 25
                     score = scores.score_change(level, delta_rows[1], score)
                     held_block[1] = False
             else:
@@ -147,7 +147,7 @@ def main():
                 future_blocks.pop(0)  
 
         if timer >= block_speed and not DEBUG_PAUSE:
-            if current_block.fall(set_blocks, current_block):
+            if current_block.fall(set_blocks):
                 current_pos = 1
                 current_block = None
                 blocks_list = None
@@ -155,7 +155,7 @@ def main():
                 if delta_rows[0]:
                     rows_cleared += delta_rows[1]
                 level = rows_cleared // 10
-                block_speed = (25 / ((level + 1) * 0.5)) + 13
+                block_speed = (25 / ((level + 1) * 0.5)) + 25
                 score = scores.score_change(level, delta_rows[1], score)
                 if piece.end_game(set_blocks, future_blocks[0].blocks):
                     RUN = False
@@ -169,6 +169,7 @@ def main():
             timer = 0
         else:
             timer += 1
+
         board.board_(WINDOW, PIECE_SIZE, current_block, set_blocks, future_blocks, score, level, rows_cleared, held_block)
         clock.tick(60)
     
